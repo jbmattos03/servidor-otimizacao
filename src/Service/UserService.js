@@ -17,7 +17,7 @@ class UserService {
         return newUser;
     }
 
-    static async updateUser(userId, name, email, password) {
+    static async updateUser(userId, name, email) {
         // Verificar se usuário existe
         const user = await User.findById(userId);
         if (!user) {
@@ -36,11 +36,8 @@ class UserService {
             if (await User.findOne({ email })) {
                 throw new Error("Email already in use");
             }
-            updatedData.email = email;
-        }
 
-        if (password) {
-            updatedData.password = password;
+            updatedData.email = email;
         }
 
         const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true });
@@ -49,7 +46,9 @@ class UserService {
     }
 
     static async getAllUsers(req, res) {
-        
+        const users = await User.findAll();
+
+        return users;
     }
 
     static async getUserById(userId) {
@@ -62,10 +61,6 @@ class UserService {
         return user;
     }
 
-    static async getAllUsers() {
-        return await User.find();
-    }
-
     static async deleteUser(userId) {
         const user = await User.findById(userId);
         
@@ -73,7 +68,7 @@ class UserService {
             throw new Error("User not found");
         }
 
-        await User.findByIdAndDelete(userId);
+        await User.destroy({where: {id: userId}});
     }
 
     static generateAuthToken(user) {
@@ -91,11 +86,42 @@ class UserService {
     static async loginUser(email, password) {
         const user = await User.findOne({ email });
 
-        if (!user || !(user.password !== password)) {
+        if (!user || !(user.password === password)) {
             throw new Error("Invalid email or password");
         }
 
         return user.generateAuthToken();
+    }
+
+    static async findUserByEmail(email) {
+        const user = await User.findOne({where: {email: email }});
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        return user;
+    }
+
+    static async savePasswordResetToken(userId, token, expiry) {
+        return await User.findByIdAndUpdate(userId, {
+            resetPasswordToken: token,
+            resetPasswordTokenExpiry: expiry,
+        });
+    }
+
+    static async findUserByResetToken(token) {
+        return await User.findOne({ resetPasswordToken: token });
+    }
+
+    static async updatePassword(userId, password) {
+        const user = await User.findById(userId);
+
+        user.password = password;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordTokenExpiry = undefined;
+        
+        await user.save();
     }
 }
 

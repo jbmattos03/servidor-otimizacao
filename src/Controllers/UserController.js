@@ -1,5 +1,7 @@
 const User = require ('../Models/User');
 const UserService = require('../Services/UserService');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 class UserController {
     static async register(req, res) {
@@ -18,11 +20,11 @@ class UserController {
 
     static async update(req, res) {
         const userId = req.params.id;
-        const {name, email, password} = req.body;
+        const {name, email} = req.body;
 
         // Atualizar usuário
         try {
-            const updatedUser = await UserService.updateUser(userId, name, email, password);
+            const updatedUser = await UserService.updateUser(userId, name, email);
             delete updatedUser.password; // Não retornar a senha
 
             return res.status(200).json(updatedUser);
@@ -91,6 +93,61 @@ class UserController {
             return res.status(200).json(user);
         } catch (error) {
             return res.status(500).json({ message: 'Error retrieving user profile' });
+        }
+    }
+
+    static async requestPasswordReset(req, res) {
+        const { email } = req.body;
+
+        try {
+            const user = await UserService.findUserByEmail(email);
+            const token = crypto.randomBytes(20).toString('hex');
+            const resetTokenExpiry = Date.now() + 1800000; // 30 minutes from now
+
+            await UserService.savePasswordResetToken(user._id, token, resetTokenExpiry);
+
+            const transporter = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            });
+
+            const mailOptions = {
+                to: user.email,
+                from: process.env.EMAIL_USER,
+                subject: 'Password Reset',
+                text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+                Please click on the following link, or paste this into your browser to complete the process:\n\n
+                http://${req.headers.host}/reset/${token}\n\n
+                If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+            };
+
+            await transporter.sendMail(mailOptions);
+
+            return res.status(200).json({ message: 'Password reset email sent' });
+        } catch (error) {
+            return res.status(500).json({ message: 'Error requesting password reset' });
+        }
+    }
+
+    static async resetPassword(req, res) {
+        const { token } = req.params;
+        const { password } = req.body;
+
+        try {
+            const user = await UserService.findUserByResetToken(token);
+
+            if (!user || user.resetTokenExpiry < Date.now()) {
+                return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
+            }
+
+            await UserService.updatePassword(user._id, password);
+
+            return res.status(200).json({ message: 'Password has been reset' });
+        } catch (error) {
+            return res.status(500).json({ message: 'Error resetting password' });
         }
     }
 }

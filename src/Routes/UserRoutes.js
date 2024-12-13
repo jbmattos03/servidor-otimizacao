@@ -6,6 +6,8 @@ const routes = (app) => {
     // Public routes
     app.post('/register', UserController.register);
     app.post('/login', UserController.login);
+    app.post('/request-password-reset', UserController.requestPasswordReset);
+    app.post('/reset-password/:token', UserController.resetPassword);
 
     // Protected routes
     app.put('/update/:id', auth, UserController.update);
