@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 
 function auth(req, res, next) {
+    // Extrair token da requisição
+    // ? é um operador de encadeamento opcional
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {

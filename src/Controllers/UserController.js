@@ -6,9 +6,10 @@ class UserController {
         const {name, email, password} = req.body;
 
         try {
-            newUser = await UserService.registerUser(name, email, password);
+            const newUser = await UserService.registerUser(name, email, password);
+            delete newUser.password; // Não retornar a senha
 
-            return res.status(201).json({message: "User registered successfully"});
+            return res.status(201).json({newUser});
             
         } catch(error) {
             return res.status(500).json({message: "Error registering user"});
@@ -22,7 +23,7 @@ class UserController {
         // Atualizar usuário
         try {
             const updatedUser = await UserService.updateUser(userId, name, email, password);
-            delete updatedUser.values.password; // Não retornar a senha
+            delete updatedUser.password; // Não retornar a senha
 
             return res.status(200).json(updatedUser);
         } catch(error) {
@@ -35,6 +36,7 @@ class UserController {
 
         try {
             const user = await UserService.getUserById(userId);
+
             return res.status(200).json(user);
         } catch (error) {
             return res.status(400).json({ message: error.message });
@@ -78,7 +80,13 @@ class UserController {
 
     static async getUserProfile(req, res) {
         try {
+            // Check if the user is present in the request object
+            if (!req.user || !req.user._id) {
+                return res.status(401).json({ message: 'Token expired. Please log in again.' });
+            }
+
             const user = await UserService.getUserById(req.user._id);
+            delete user.password;
             
             return res.status(200).json(user);
         } catch (error) {
