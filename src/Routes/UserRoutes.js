@@ -3,13 +3,13 @@ const UserController = require('../Controllers/UserController');
 const auth = require('../Middleware/Auth');
 
 const routes = (app) => {
-    // Public routes
+    // Rotas públicas
     app.post('/register', UserController.register);
     app.post('/login', UserController.login);
     app.post('/request-password-reset', UserController.requestPasswordReset);
     app.post('/reset-password/:token', UserController.resetPassword);
 
-    // Protected routes
+    // Rotas protegidas
     app.put('/update/:id', auth, UserController.update);
     app.get('/profile', auth, UserController.getUserProfile);
     app.get('/:id', auth, UserController.getUserById);

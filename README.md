@@ -9,3 +9,6 @@
 + Usuário deve ser capaz de acessar seu histórico de questões;
 + Usuário deve ser capaz de deletar uma questão de seu histórico;
 + Uma questão tem um enunciado submetido pelo usuário e uma resposta associada;
+
+## Como rodar:
+npm run dev

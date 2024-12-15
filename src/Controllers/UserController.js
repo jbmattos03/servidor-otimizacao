@@ -2,6 +2,7 @@ const User = require ('../Models/User');
 const UserService = require('../Services/UserService');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 class UserController {
     static async register(req, res) {
@@ -82,7 +83,7 @@ class UserController {
 
     static async getUserProfile(req, res) {
         try {
-            // Check if the user is present in the request object
+            // Checar se usuário está presente na requisição
             if (!req.user || !req.user._id) {
                 return res.status(401).json({ message: 'Token expired. Please log in again.' });
             }
@@ -102,7 +103,7 @@ class UserController {
         try {
             const user = await UserService.findUserByEmail(email);
             const token = crypto.randomBytes(20).toString('hex');
-            const resetTokenExpiry = Date.now() + 1800000; // 30 minutes from now
+            const resetTokenExpiry = Date.now() + 1800000; // 30 minutos a partir de agora
 
             await UserService.savePasswordResetToken(user._id, token, resetTokenExpiry);
 

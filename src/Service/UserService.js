@@ -117,11 +117,17 @@ class UserService {
     static async updatePassword(userId, password) {
         const user = await User.findById(userId);
 
-        user.password = password;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordTokenExpiry = undefined;
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        const updatedData = {
+            password: password,
+            resetPasswordToken: null,
+            resetPasswordTokenExpiry: null
+        }
         
-        await user.save();
+        await User.update(updatedData, {where: {id: userId}});
     }
 }
 
