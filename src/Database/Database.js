@@ -1,6 +1,5 @@
-const { Sequelize } = require("sequelize");
-const mysql = require("mysql2/promise");
-require('dotenv').config();
+import { Sequelize } from "sequelize";
+import mysql from "mysql2/promise";
 
 async function createDatabase() {
     const mysqlConnection = await mysql.createConnection({
@@ -9,8 +8,13 @@ async function createDatabase() {
         password: process.env.DB_PASSWORD,
     });
 
-    await mysqlConnection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
-    await mysqlConnection.end();
+    try {
+        await mysqlConnection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
+        console.log("Database checked/created successfully");
+        await mysqlConnection.end();
+    } catch(error) {
+        console.log("An unexpected error has occurred: ", error);
+    }
 }
 
 const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
@@ -26,8 +30,8 @@ async function initializeSequelize() {
         await sequelize.authenticate();
         console.log("Successfully connected to the database");
     } catch (err) {
-        console.log("An unexpected error has occurred: ", err);
+        console.log("An unexpected error has occurred: ", error);
     }
 }
 
-module.exports = { sequelize, initializeSequelize };
+export { sequelize, initializeSequelize };

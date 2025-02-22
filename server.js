@@ -1,12 +1,22 @@
 import express from "express";
-const userRoutes = require("./Routes/UserRoutes");
-const questionRoutes = require("./Routes/QuestionRoutes");
+import userRoutes from "./src/Routes/UserRoutes.js";
+import questionRoutes from "./src/Routes/QuestionRoutes.js";
+import { sequelize, initializeSequelize } from "./src/Database/Database.js";
 
 const app = express();
+app.use(express.json());
 
 userRoutes(app); // Passar servidor para as rotas de usuário
 questionRoutes(app); // Passar servidor para as rotas de questões
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+initializeSequelize().then(() => {
+  sequelize.sync().then(() => {
+    app.listen(process.env.PORT, () => {
+      console.log("Server is running on port 3000");
+    });
+  }).catch(error => {
+    console.log("Unable to sync with the database. ", error);
+  })
+}).catch(error => {
+  console.log("Unable to initialize sequelize", error);
 });

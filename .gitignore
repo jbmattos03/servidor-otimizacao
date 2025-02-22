@@ -6,3 +6,6 @@ node_modules
 
 # Ignorar arquivos de texto
 *.txt 
+
+# Ignorar arquivos do Jupyter
+*.ipynb

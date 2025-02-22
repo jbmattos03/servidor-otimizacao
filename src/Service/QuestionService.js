@@ -1,5 +1,5 @@
-const Question = require('../Models/Question');
-const {PythonFunction} = require('../Middleware/PythonFunction');
+import Question from "../Models/QuestionModel.js"; 
+import callPythonFunction from "../Middleware/PythonFunction.js";
 
 class QuestionService {
     static async newQuestion(user, question, answer) {
@@ -7,6 +7,7 @@ class QuestionService {
             user,
             question,
             answer,
+            status: 0,
         });
 
         return newQuestion;
@@ -22,8 +23,18 @@ class QuestionService {
         return question;
     }
 
-    static async getAllQuestions() {
-        const questions = await Question.findAll();
+    static async getAllQuestionsByUser(id) {
+        const questions = await Question.findAll({where: {user: id}});
+
+        if(!questions) {
+            throw new Error("No questions found");
+        }
+
+        return questions;
+    }
+
+    static async getAnsweredQuestionsByUser(id) {
+        const questions = await Question.findAll({where: {user: id, status: 1}});
 
         if(!questions) {
             throw new Error("No questions found");
@@ -49,9 +60,11 @@ class QuestionService {
             throw new Error("Question not found");
         }
 
-        const answer = await QuestionService.PythonFunction(question.values.question);
-        const answeredQuestion = await Question.update({answer: answer}, {where: {id: questionId}});
+        const answer = await callPythonFunction(question.values.question);
+        const answeredQuestion = await Question.update({answer: answer, status: 1}, {where: {id: questionId}});
 
         return answeredQuestion;
     }
 }
+
+export default QuestionService;

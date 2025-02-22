@@ -1,5 +1,5 @@
-const { DataTypes, Model } = require('sequelize');
-const { sequelize } = require('../Database/Database');
+import { Model, DataTypes } from "sequelize";
+import { sequelize, initializeSequelize } from "../Database/Database.js";
 
 class User extends Model {
     static associate(models) {
@@ -8,21 +8,21 @@ class User extends Model {
                 name: "userId",
                 allowNull: false, //Garante participação total
             },
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE',
-            as: 'questions' // Nome do relacionamento
+            onDelete: "CASCADE",
+            onUpdate: "CASCADE",
+            as: "questions" // Nome do relacionamento
         });
     }
-    
 }
 
 User.init({
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
-    role: DataTypes.STRING,
     createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE
+    updatedAt: DataTypes.DATE,
+    resetToken: DataTypes.STRING,
+    resetTokenExpiry: DataTypes.DATE
 }, {
     sequelize,
     modelName: "User",
@@ -30,9 +30,9 @@ User.init({
     timestamps: true,
     defaultScope: {
         attributes: {
-            exclude: ['password']
+            exclude: ["password"]
         }
     }
 });
 
-module.exports = User;
+export default User;

@@ -1,8 +1,7 @@
-const User = require ('../Models/User');
-const UserService = require('../Services/UserService');
-const crypto = require('crypto');
-const nodemailer = require('nodemailer');
-require('dotenv').config();
+import User  from "../Models/UserModel.js";
+import UserService from "../Service/UserService.js";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 class UserController {
     static async register(req, res) {
@@ -10,9 +9,10 @@ class UserController {
 
         try {
             const newUser = await UserService.registerUser(name, email, password);
-            delete newUser.password; // Não retornar a senha
+            const userObject = newUser.toJSON(); // Converter para objeto para poder deletar a senha
+            delete userObject.password; 
 
-            return res.status(201).json({newUser});
+            return res.status(201).json({newUser: userObject});
             
         } catch(error) {
             return res.status(500).json({message: "Error registering user"});
@@ -21,7 +21,7 @@ class UserController {
 
     static async update(req, res) {
         const userId = req.params.id;
-        const {name, email} = req.body;
+        const { name, email } = req.body;
 
         // Atualizar usuário
         try {
@@ -39,16 +39,22 @@ class UserController {
 
         try {
             const user = await UserService.getUserById(userId);
+            delete user.password; // Não retornar a senha
 
             return res.status(200).json(user);
         } catch (error) {
-            return res.status(400).json({ message: error.message });
+            return res.status(400).json({ message: "User not found" });
         }
     }
 
     static async getAllUsers(req, res) {
         try {
             const users = await UserService.getAllUsers();
+
+            users.forEach(user => {
+                delete user.password;
+            }); // Não retornar a senha
+
             return res.status(200).json(users);
         } catch (error) {
             return res.status(500).json({ message: "Error retrieving users" });
@@ -73,7 +79,7 @@ class UserController {
         const {email, password} = req.body;
 
         try {
-            const token = await UserService.login(email, password);
+            const token = await UserService.loginUser(email, password);
 
             return res.status(200).json({token});
         } catch(error) {
@@ -84,16 +90,17 @@ class UserController {
     static async getUserProfile(req, res) {
         try {
             // Checar se usuário está presente na requisição
-            if (!req.user || !req.user._id) {
-                return res.status(401).json({ message: 'Token expired. Please log in again.' });
+            if (!req.user || !req.user.id) {
+                return res.status(401).json({ message: "Token expired. Please log in again." });
             }
 
-            const user = await UserService.getUserById(req.user._id);
-            delete user.password;
+            const user = await UserService.getUserById(req.user.id);
+            const userObject = user.toJSON();
+            delete userObject.password;
             
             return res.status(200).json(user);
         } catch (error) {
-            return res.status(500).json({ message: 'Error retrieving user profile' });
+            return res.status(500).json({ message: "Error retrieving user profile" });
         }
     }
 
@@ -102,34 +109,41 @@ class UserController {
 
         try {
             const user = await UserService.findUserByEmail(email);
-            const token = crypto.randomBytes(20).toString('hex');
-            const resetTokenExpiry = Date.now() + 1800000; // 30 minutos a partir de agora
+            const id = user.id;
 
-            await UserService.savePasswordResetToken(user._id, token, resetTokenExpiry);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            const token = crypto.randomBytes(20).toString("hex");
+            const expiry = Date.now() + 3600000; // 1 hour
+
+            await UserService.savePasswordResetToken(id, token, expiry);
 
             const transporter = nodemailer.createTransport({
-                service: 'Gmail',
+                service: "gmail",
                 auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
+                    user: process.env.NODE_USER,
+                    pass: process.env.NODE_PASS,
                 },
             });
 
             const mailOptions = {
-                to: user.email,
                 from: process.env.EMAIL_USER,
-                subject: 'Password Reset',
+                to: user.email,
+                subject: "Password Reset",
                 text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
                 Please click on the following link, or paste this into your browser to complete the process:\n\n
-                http://${req.headers.host}/reset/${token}\n\n
+                http://localhost:3000/reset-password/${token}\n\n
                 If you did not request this, please ignore this email and your password will remain unchanged.\n`,
             };
 
             await transporter.sendMail(mailOptions);
 
-            return res.status(200).json({ message: 'Password reset email sent' });
+            return res.status(200).json({ message: "Password reset email sent" });
         } catch (error) {
-            return res.status(500).json({ message: 'Error requesting password reset' });
+            console.error("Error sending password reset email:", error);
+            return res.status(500).json({ message: error.message });
         }
     }
 
@@ -137,18 +151,22 @@ class UserController {
         const { token } = req.params;
         const { password } = req.body;
 
+        console.log(token);
+        console.log(password);
+
         try {
             const user = await UserService.findUserByResetToken(token);
+            console.log(user);
 
             if (!user || user.resetTokenExpiry < Date.now()) {
-                return res.status(400).json({ message: 'Password reset token is invalid or has expired' });
+                return res.status(400).json({ message: "Invalid or expired token" });
             }
 
-            await UserService.updatePassword(user._id, password);
+            await UserService.updatePassword(user.id, password);
 
-            return res.status(200).json({ message: 'Password has been reset' });
+            return res.status(200).json({ message: "Password has been reset" });
         } catch (error) {
-            return res.status(500).json({ message: 'Error resetting password' });
+            return res.status(500).json({ message: "Error resetting password" });
         }
     }
 }

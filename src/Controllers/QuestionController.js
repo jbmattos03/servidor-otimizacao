@@ -1,5 +1,6 @@
-const Question = require('../Models/Question');
-const QuestionService = require('../Services/QuestionService');
+import Question from "../Models/QuestionModel.js";
+import QuestionService from "../Service/QuestionService.js";
+import callPythonFunction from "../Middleware/PythonFunction.js";
 
 class QuestionController {
     static async newQuestion(req, res) {
@@ -27,9 +28,9 @@ class QuestionController {
         }
     }
 
-    static async getAllQuestions(req, res) {
+    static async getAllQuestionsByUser(req, res) {
         try {
-            const questions = await QuestionService.getAllQuestions();
+            const questions = await QuestionService.getAllQuestions(req.params.userId);
 
             return res.status(200).json(questions);
         } catch (error) {
@@ -43,7 +44,7 @@ class QuestionController {
         try {
             await QuestionService.deleteQuestion(questionId);
 
-            return res.status(204).end();
+            return res.status(204).json({ message: "Question deleted" });
         } catch (error) {
             return res.status(500).json({ message: "Error deleting question" });
         }
@@ -60,4 +61,19 @@ class QuestionController {
             return res.status(500).json({ message: "Error answering question" });
         }
     }
+
+    static async getAnsweredQuestionsByUser(req, res) {
+        try {
+            const questions = await QuestionService.getAnsweredQuestionsByUser();
+
+            return res.status(200).json(questions);
+        } catch (error) {
+            return res.status(500).json({ message: "Error retrieving questions" });
+        }
+    }
+
+
+
 }
+
+export default QuestionController;

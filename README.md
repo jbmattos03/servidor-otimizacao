@@ -11,4 +11,29 @@
 + Uma questão tem um enunciado submetido pelo usuário e uma resposta associada;
 
 ## Como rodar:
+#### Inicializar node via fnm no Windows (opcional)
+Clique duas vezes em start_node.bat ou rode o seguinte comando no Powershell, certificando-se de que está na pasta do projeto:
+
+´´´
+.\start_node.bat
+´´´
+
+#### Instalar dependências
++ bcrypt
++ nodemailer
++ jsonwebtoken
+
+#### Configurar jwt
+
+´´´
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+´´´
+
+#### Configurar .env
+Ver .env_example.txt
+
+#### Rodar servidor
+
+´´´
 npm run dev
+´´´
