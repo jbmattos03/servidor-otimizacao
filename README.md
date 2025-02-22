@@ -24,7 +24,7 @@ Clique duas vezes em start_node.bat ou rode o seguinte comando no Powershell, ce
 + jsonwebtoken
 
 #### Configurar jwt
-Rode o seguinte comando no terminal, então copie-o e cole-o na variável de ambiente JWT_SECRET
+Rode o seguinte comando no terminal, então copie-o e cole-o na variável de ambiente JWT_SECRET:
 
 ```
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
