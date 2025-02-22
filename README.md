@@ -12,7 +12,19 @@
 
 ## Como rodar:
 #### Inicializar node via fnm no Windows (opcional)
-Clique duas vezes em start_node.bat ou rode o seguinte comando no Powershell, certificando-se de que está na pasta do projeto:
+Primeiro, rode o seguinte comando em um terminal Powershell como administrador:
+
+```
+Invoke-Item $profile
+```
+
+Então, adicione a seguinte linha ao final do seu profile:
+
+```
+fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
+```
+
+Por fim, feche o terminal, então clique duas vezes em start_node.bat ou rode o seguinte comando em um outro terminal Powershell, certificando-se de que está na pasta do projeto:
 
 ```
 .\start_node.bat
@@ -23,7 +35,7 @@ Clique duas vezes em start_node.bat ou rode o seguinte comando no Powershell, ce
 + nodemailer
 + jsonwebtoken
 
-#### Configurar jwt
+#### Criar jwt secret key
 Rode o seguinte comando no terminal, então copie-o e cole-o na variável de ambiente JWT_SECRET:
 
 ```
