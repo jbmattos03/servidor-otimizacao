@@ -5,10 +5,21 @@ import callPythonFunction from "../Middleware/PythonFunction.js";
 class QuestionController {
     static async newQuestion(req, res) {
         const user = req.user;
-        const { question, answer } = req.body;
+        const { qtd_var_obj, qtd_res_des, matriz, answer } = req.body;
+
+        // Verifica se o usuário inseriu os dados necessários
+        if (!qtd_var_obj || !qtd_res_des || !matriz) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
 
         try {
-            const newQuestion = await QuestionService.newQuestion(user, question, answer);
+            const newQuestion = await QuestionService.newQuestion(
+                user, 
+                qtd_var_obj,
+                qtd_res_des,
+                matriz,
+                answer,
+            );
 
             return res.status(201).json(newQuestion);
         } catch (error) {
