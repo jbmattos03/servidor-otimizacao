@@ -1,47 +1,42 @@
-import spawn from "child_process";
-import fs from "fs";
+import { spawn } from "child_process";
 
-async function callPythonFunction(question) {
-    const input = JSON.stringify(question);
+function callPythonFunction(question) {
+    return new Promise((resolve, reject) => {
+        const pythonProcess = spawn("python", ["src/Python/simplex.py"]);
+        let output = "";
+        let errorOutput = "";
 
-    // Criar um arquivo temporário para armazenar o input
-    const tempFilePath = path.join(__dirname, 'temp_input.json');
-    fs.writeFileSync(tempFilePath, input);
+        pythonProcess.stdin.write(JSON.stringify(question));
+        pythonProcess.stdin.end();
 
-    // Iniciar o processo Python
-    const pythonProcess = spawn("python", ["src/Middleware/simplex.py", tempFilePath]);
+        pythonProcess.stdout.on("data", (data) => {
+            output += data.toString();
+        });
 
-    pythonProcess.stdin.write(input);
-    pythonProcess.stdin.end();
+        pythonProcess.stderr.on("data", (data) => {
+            errorOutput += data.toString();
+        });
 
-    let result = "";
+        pythonProcess.on("close", (code) => {
+            if (code === 0) {
+                try {
+                    const result = JSON.parse(output);
+                    console.log("Parsed result:", result);
+                    resolve(result);
+                } catch (error) {
+                    console.error("Error parsing JSON:", error);
+                    reject(error);
+                }
+            } else {
+                console.error("Python script error:", errorOutput);
+                reject(new Error(errorOutput));
+            }
+        });
 
-    // Ler a saída do processo Python
-    pythonProcess.stdout.on("data", (data) => {
-        result += data.toString();
-    });
-
-    // Lidar com erros
-    pythonProcess.stderr.on("data", (data) => {
-        console.error(`stderr: ${data}`);
-    });
-
-    // Lidar com o término do processo
-    pythonProcess.on("close", (code) => {
-        if (code !== 0) {
-            return res.status(500).json({ message: "Error processing input" });
-        }
-
-        try {
-            const output = JSON.parse(result);
-
-            // Atualizar question.answer com o output
-            req.question.answer = output;
-            next();
-        } catch (error) {
-            return res.status(500).json({ message: "Error parsing output" });
-        }
+        pythonProcess.on("error", (error) => {
+            reject(error);
+        });
     });
 }
 
-export default { callPythonFunction };
+export default callPythonFunction;
