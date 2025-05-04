@@ -29,7 +29,7 @@ async function initializeSequelize() {
     try {
         await sequelize.authenticate();
         console.log("Successfully connected to the database");
-    } catch (err) {
+    } catch (error) {
         console.log("An unexpected error has occurred: ", error);
     }
 }
