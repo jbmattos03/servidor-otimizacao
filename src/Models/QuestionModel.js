@@ -16,9 +16,11 @@ class Question extends Model {
 }
 
 Question.init({
-    question: DataTypes.STRING,
-    answer: DataTypes.STRING,
-    status: DataTypes.BOOLEAN,
+    qtd_var_obj: DataTypes.INTEGER,
+    qtd_res_des: DataTypes.INTEGER,
+    matriz: DataTypes.JSON,
+    answer: DataTypes.JSON,
+    isAnswered: DataTypes.BOOLEAN,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
 }, {
