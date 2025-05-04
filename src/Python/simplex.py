@@ -3,26 +3,24 @@ import sys
 import json
 
 # Function to read JSON data from a file
-def read_json(file_path):
-    with open(file_path, 'r') as file:
-        data = json.load(file)
-    return data
+def read_json_stdin():
+    input_data = sys.stdin.read()
+    return json.loads(input_data)
 
 # Função main
 def simplex():
-    # Checar se o usuário forneceu o caminho para o arquivo JSON
-    if len(sys.argv) != 2:
-        print("Usage: python simplex.py <path_to_json_file>")
-        sys.exit(1)
-
-    # Lendo o arquivo JSON
-    file_path = sys.argv[1]
-    data = read_json(file_path)
+    # Read JSON from stdin
+    data = read_json_stdin()
 
     # Extrair variáveis do arquivo JSON
     qtd_var_obj = data['qtd_var_obj']
     qtd_res_des = data['qtd_res_des']
     matriz = data['matriz']
+
+    if isinstance(matriz, str):
+        matriz = json.loads(matriz)
+
+    matriz = np.array(matriz, dtype=float)
 
     # Criar lista de variáveis para o output
     lista_var = []
@@ -82,5 +80,5 @@ def simplex():
 
     print(json.dumps(output))
 
-if __name__ == "__simplex__":
+if __name__ == "__main__":
     simplex()
