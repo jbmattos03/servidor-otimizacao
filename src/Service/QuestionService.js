@@ -9,7 +9,7 @@ class QuestionService {
             qtd_res_des,
             matriz,
             answer,
-            status: 0,
+            isAnswered: 0,
         });
 
         return newQuestion;
@@ -37,6 +37,11 @@ class QuestionService {
 
     static async getAnsweredQuestionsByUser(id) {
         const questions = await QuestionService.getAllQuestionsByUser(id);
+        const answeredQuestions = questions.filter(question => question.isAnswered === 1);
+
+        if (answeredQuestions.length === 0) {
+            throw new Error("No answered questions found");
+        }
 
         return questions;
     }
