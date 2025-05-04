@@ -7,6 +7,10 @@ node_modules
 # Ignorar arquivos de texto
 *.txt
 !.env_example.txt
+!requirements.txt
 
 # Ignorar arquivos do Jupyter
 *.ipynb
+
+# Ignorar .venv
+.venv
