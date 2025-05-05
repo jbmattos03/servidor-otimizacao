@@ -28,10 +28,17 @@ Por fim, feche o terminal, então clique duas vezes em start_node.bat ou rode o 
 + nodemailer
 + jsonwebtoken
 
-Para instalar as dependências, rode o comando:
+Para instalar as dependências do node, rode o comando:
 ```bash
 npm install
 ```
+
+Para instalar as dependências do script Python, rode:
+```bash
+venv.sh
+```
+
+**Caso não esteja no Linux, rode cada um dos comandos presentes em venv.sh separadamente.**
 
 #### Criar jwt secret key
 Rode o seguinte comando no terminal, então copie-o e cole-o na variável de ambiente JWT_SECRET:
