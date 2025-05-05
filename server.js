@@ -1,7 +1,7 @@
 import express from "express";
-import userRoutes from "./src/Routes/UserRoutes.js";
-import questionRoutes from "./src/Routes/QuestionRoutes.js";
-import { sequelize, initializeSequelize } from "./src/Database/Database.js";
+import userRoutes from "./src/backend/Routes/UserRoutes.js";
+import questionRoutes from "./src/backend/Routes/QuestionRoutes.js";
+import { sequelize, initializeSequelize } from "./src/backend/Database/Database.js";
 
 const app = express();
 app.use(express.json());
