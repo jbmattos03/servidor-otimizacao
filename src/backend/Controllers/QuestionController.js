@@ -1,10 +1,8 @@
-import Question from "../Models/QuestionModel.js";
 import QuestionService from "../Service/QuestionService.js";
-import callPythonFunction from "../Middleware/PythonFunction.js";
 
 class QuestionController {
     static async newQuestion(req, res) {
-        const user = req.user;
+        const userId = req.user.id;
         const { qtd_var_obj, qtd_res_des, matriz, answer } = req.body;
 
         // Verifica se o usuário inseriu os dados necessários
@@ -14,7 +12,7 @@ class QuestionController {
 
         try {
             const newQuestion = await QuestionService.newQuestion(
-                user, 
+                userId, 
                 qtd_var_obj,
                 qtd_res_des,
                 matriz,
@@ -23,7 +21,7 @@ class QuestionController {
 
             return res.status(201).json(newQuestion);
         } catch (error) {
-            return res.status(500).json({ message: "Error creating question" });
+            return res.status(500).json({ message: "Error creating question:", error: error.message });
         }
     }
 
@@ -35,17 +33,19 @@ class QuestionController {
 
             return res.status(200).json(question);
         } catch (error) {
-            return res.status(500).json({ message: "Error retrieving question" });
+            return res.status(500).json({ message: "Error retrieving question:" });
         }
     }
 
     static async getAllQuestionsByUser(req, res) {
+        const userId = req.user.id;
+        
         try {
-            const questions = await QuestionService.getAllQuestions(req.params.userId);
+            const questions = await QuestionService.getAllQuestionsByUser(userId);
 
             return res.status(200).json(questions);
         } catch (error) {
-            return res.status(500).json({ message: "Error retrieving questions" });
+            return res.status(500).json({ message: "Error retrieving questions " });
         }
     }
 
@@ -55,7 +55,7 @@ class QuestionController {
         try {
             await QuestionService.deleteQuestion(questionId);
 
-            return res.status(204).json({ message: "Question deleted" });
+            return res.status(200).json({ message: "Question deleted" });
         } catch (error) {
             return res.status(500).json({ message: "Error deleting question" });
         }
@@ -67,24 +67,23 @@ class QuestionController {
         try {
             const answeredQuestion = await QuestionService.answerQuestion(questionId);
 
-            return res.status(204).json(answeredQuestion);
+            return res.status(200).json(answeredQuestion);
         } catch (error) {
             return res.status(500).json({ message: "Error answering question" });
         }
     }
 
     static async getAnsweredQuestionsByUser(req, res) {
+        const userId = req.user.id;
+
         try {
-            const questions = await QuestionService.getAnsweredQuestionsByUser();
+            const questions = await QuestionService.getAnsweredQuestionsByUser(userId);
 
             return res.status(200).json(questions);
         } catch (error) {
-            return res.status(500).json({ message: "Error retrieving questions" });
+            return res.status(500).json({ message: "Error retrieving questions", error: error.message });
         }
     }
-
-
-
 }
 
 export default QuestionController;

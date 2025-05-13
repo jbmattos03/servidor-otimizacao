@@ -4,7 +4,7 @@ import callPythonFunction from "../Middleware/PythonFunction.js";
 class QuestionService {
     static async newQuestion(user, qtd_var_obj, qtd_res_des, matriz, answer) {
         const newQuestion = await Question.create({
-            user,
+            userId: user,
             qtd_var_obj,
             qtd_res_des,
             matriz,
@@ -26,9 +26,9 @@ class QuestionService {
     }
 
     static async getAllQuestionsByUser(id) {
-        const questions = await Question.findAll({where: {user: id}});
+        const questions = await Question.findAll({ where: { userId: id } });
 
-        if(!questions) {
+        if (questions.length === 0) {
             throw new Error("No questions found");
         }
 
@@ -37,7 +37,7 @@ class QuestionService {
 
     static async getAnsweredQuestionsByUser(id) {
         const questions = await QuestionService.getAllQuestionsByUser(id);
-        const answeredQuestions = questions.filter(question => question.isAnswered === 1);
+        const answeredQuestions = questions.filter(question => question.isAnswered === true);
 
         if (answeredQuestions.length === 0) {
             throw new Error("No answered questions found");
@@ -55,9 +55,9 @@ class QuestionService {
     static async answerQuestion(questionId) {
         const question = await QuestionService.getQuestionById(questionId);
 
-        //if (question.isAnswered === 1) {
-           // throw new Error("Question already answered");
-        //}
+        if (question.isAnswered === true) {
+            throw new Error("Question already answered");
+        }
 
         const answer = await callPythonFunction({
             qtd_var_obj: question.qtd_var_obj,
@@ -65,12 +65,16 @@ class QuestionService {
             matriz: question.matriz,
         });
 
-        const answeredQuestion = await Question.update(
+        // Atualizar a questão com a resposta
+        await Question.update(
             { answer: answer, isAnswered: 1 }, 
             { where: { id: questionId } }
         );
 
-        return answeredQuestion;
+        // Retornar a questão atualizada
+        const answeredQuestion = await QuestionService.getQuestionById(questionId);
+
+        return answeredQuestion.answer;
     }
 }
 
