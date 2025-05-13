@@ -1,16 +1,16 @@
 import { Model, DataTypes } from "sequelize";
-import { sequelize, initializeSequelize } from "../Database/Database.js";
+import { sequelize } from "../Database/Database.js";
 
 class Question extends Model {
     static associate(models) {
-        this.hasMany(models.Question, {
+        this.belongsTo(models.User, {
             foreignKey: {
                 name: "userId",
-                allowNull: false, //Garante participação total
+                allowNull: false, // Garante participação total
             },
             onDelete: "CASCADE",
             onUpdate: "CASCADE",
-            as: "users" // Nome do relacionamento
+            as: "user" // Nome do relacionamento
         });
     }
 }
@@ -23,6 +23,14 @@ Question.init({
     isAnswered: DataTypes.BOOLEAN,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
+    userId: {  // Add this field
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'users',
+            key: 'id'
+        }
+    }
 }, {
     sequelize,
     modelName: "Question",
