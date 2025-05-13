@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 
 function callPythonFunction(question) {
     return new Promise((resolve, reject) => {
-        const pythonProcess = spawn("python", ["src/backend/Python/simplex.py"]);
+        const pythonProcess = spawn("python", ["Python/simplex.py"]);
         let output = "";
         let errorOutput = "";
 
