@@ -1,4 +1,3 @@
-import User  from "../Models/UserModel.js";
 import UserService from "../Service/UserService.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";

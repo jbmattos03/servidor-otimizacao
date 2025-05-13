@@ -1,12 +1,12 @@
 import { Model, DataTypes } from "sequelize";
-import { sequelize, initializeSequelize } from "../Database/Database.js";
+import { sequelize } from "../Database/Database.js";
 
 class User extends Model {
     static associate(models) {
         this.hasMany(models.Question, {
             foreignKey: {
                 name: "userId",
-                allowNull: false, //Garante participação total
+                allowNull: false, // Garante participação total
             },
             onDelete: "CASCADE",
             onUpdate: "CASCADE",
