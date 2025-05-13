@@ -1,14 +1,14 @@
-import questionController from "../Controllers/QuestionController.js"; // Importar controller
-import callPythonFunction from "../Middleware/PythonFunction.js";
+import QuestionController from "../Controllers/QuestionController.js"; // Importar controller
 import auth from "../Middleware/Auth.js"; // Importar middleware de autenticação
 
 const questionRoutes = (app) => {
     // Rotas protegidas
-    app.post("/new-question", auth, questionController.newQuestion);
-    app.post("/answer-question/:id", auth, questionController.answerQuestion);
-    app.post("/delete-question", auth, questionController.deleteQuestion);
-    app.get("/all-questions", auth, questionController.getAllQuestionsByUser);
-    app.get("/question/:id", auth, questionController.getQuestionById);
+    app.get("/questions", auth, QuestionController.getAllQuestionsByUser);
+    app.get("/questions/answered", auth, QuestionController.getAnsweredQuestionsByUser);
+    app.post("/questions/new-question", auth, QuestionController.newQuestion);
+    app.post("/questions/answer-question/:id", auth, QuestionController.answerQuestion);
+    app.post("/questions/delete-question/:id", auth, QuestionController.deleteQuestion);
+    app.get("/questions/:id", auth, QuestionController.getQuestionById);
 }
 
 // Requisições HTTP:

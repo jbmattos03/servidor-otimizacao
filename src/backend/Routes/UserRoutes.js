@@ -1,4 +1,3 @@
-import express from "express";
 import UserController from "../Controllers/UserController.js";
 import auth from "../Middleware/Auth.js";
 
@@ -10,9 +9,9 @@ const userRoutes = (app) => {
     app.put("/reset-password/:token", UserController.resetPassword);
 
     // Rotas protegidas
-    app.put("/update/:id", auth, UserController.update);
-    app.get("/profile", auth, UserController.getUserProfile);
-    app.get("/:id", auth, UserController.getUserById);
+    app.get("/users/profile", auth, UserController.getUserProfile);
+    app.put("/users/update/:id", auth, UserController.update);
+    app.get("/users/:id", auth, UserController.getUserById);
 }
 
 // Requisições HTTP:
