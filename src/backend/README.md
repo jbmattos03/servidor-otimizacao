@@ -1,8 +1,5 @@
 # Backend
 
-## Requisitos
-Ver [Documento de Requisitos](https://docs.google.com/document/d/1qyKZ-SJBxSh2dNNH1_3rclNo-EZlpO82Jdzaw9sHqA8/edit?usp=sharing).
-
 ## Como rodar:
 #### Inicializar node via fnm no Windows (opcional)
 Primeiro, rode o seguinte comando em um terminal Powershell como administrador:
