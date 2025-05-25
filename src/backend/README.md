@@ -32,10 +32,13 @@ npm install
 
 Para instalar as dependências do script Python, rode:
 ```bash
-venv.sh
+source venv.sh
 ```
 
-**Caso não esteja no Linux, rode cada um dos comandos presentes em venv.sh separadamente.**
+Ou, caso esteja no Windows:
+```powershell
+./venv.bat
+```
 
 #### Criar jwt secret key
 Rode o seguinte comando no terminal, então copie-o e cole-o na variável de ambiente JWT_SECRET:
@@ -49,5 +52,6 @@ Ver .env_example.txt
 
 #### Rodar servidor
 ```bash
+cd src/backend
 npm run dev
 ```
