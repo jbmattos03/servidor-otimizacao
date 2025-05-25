@@ -16,6 +16,7 @@ class Question extends Model {
 }
 
 Question.init({
+    modo: DataTypes.STRING,
     qtd_var_obj: DataTypes.INTEGER,
     qtd_res_des: DataTypes.INTEGER,
     matriz: DataTypes.JSON,
@@ -23,7 +24,7 @@ Question.init({
     isAnswered: DataTypes.BOOLEAN,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
-    userId: {  // Add this field
+    userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {

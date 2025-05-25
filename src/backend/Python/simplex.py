@@ -13,9 +13,10 @@ def simplex():
     data = read_json_stdin()
 
     # Extrair variáveis do arquivo JSON
-    qtd_var_obj = data['qtd_var_obj']
-    qtd_res_des = data['qtd_res_des']
-    matriz = data['matriz']
+    modo = data["modo"]
+    qtd_var_obj = data["qtd_var_obj"]
+    qtd_res_des = data["qtd_res_des"]
+    matriz = data["matriz"]
 
     if isinstance(matriz, str):
         matriz = json.loads(matriz)
@@ -25,7 +26,7 @@ def simplex():
     # Criar lista de variáveis para o output
     lista_var = []
 
-    for i in range(qtd_var_obj+1, (qtd_var_obj + qtd_res_des)+1):
+    for i in range(min(qtd_res_des, qtd_var_obj)+1, (qtd_var_obj + qtd_res_des)+1):
         lista_var.append(i)
 
     lista_var = np.array(lista_var)
@@ -41,8 +42,12 @@ def simplex():
     # Pegando a última linha da matriz
     ultima_linha = matriz[qtd_linha-1]
 
-    # Código para maximização
-    # TODO: Implementar minimização
+    # Verificando se o problema é de minimização ou maximização
+    if modo == "minimização":
+        # Multiplicando a última linha por -1
+        for i in range(qtd_coluna):
+            ultima_linha[i] = ultima_linha[i] * -1
+
     while len([*filter(lambda x: x < 0, ultima_linha)]) > 0:
         menor = min(ultima_linha)
         

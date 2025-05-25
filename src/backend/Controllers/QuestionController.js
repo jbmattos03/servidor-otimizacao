@@ -3,7 +3,7 @@ import QuestionService from "../Service/QuestionService.js";
 class QuestionController {
     static async newQuestion(req, res) {
         const userId = req.user.id;
-        const { qtd_var_obj, qtd_res_des, matriz, answer } = req.body;
+        const { modo, qtd_var_obj, qtd_res_des, matriz, resposta } = req.body;
 
         // Verifica se o usuário inseriu os dados necessários
         if (!qtd_var_obj || !qtd_res_des || !matriz) {
@@ -13,10 +13,11 @@ class QuestionController {
         try {
             const newQuestion = await QuestionService.newQuestion(
                 userId, 
+                modo,
                 qtd_var_obj,
                 qtd_res_des,
                 matriz,
-                answer,
+                resposta,
             );
 
             return res.status(201).json(newQuestion);
@@ -69,7 +70,7 @@ class QuestionController {
 
             return res.status(200).json(answeredQuestion);
         } catch (error) {
-            return res.status(500).json({ message: "Error answering question" });
+            return res.status(500).json({ message: "Error answering question:", error: error.message });
         }
     }
 
